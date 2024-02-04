@@ -1,0 +1,5 @@
+.DS_Store
+dist
+bin
+node_modules
+/wallet-cleanup.log
