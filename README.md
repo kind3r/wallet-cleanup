@@ -1,6 +1,15 @@
 # wallet-cleanup
 Solana wallet cleanup tool
 
+[Features](#features)  
+[Instalation](#instalation)  
+[Building](#building)  
+[Usage](#usage)  
+Examples  
+  - [using the built binaries (linux x64)](#examples-using-the-built-binaries-linux-x64)
+  - [using the source code](#examples-using-the-source-code)
+  - [with csv file](#example-with-csv-file)
+
 ## Features
 * Closes empty token accounts to recover rent.
 
@@ -41,6 +50,7 @@ Options:
   -V, --version                        output the version number
   -r, --rpc <string>                   RPC to use (default: "https://api.mainnet-beta.solana.com", env: WC_RPC)
   -k, --private-key <string>           Wallet private key (file or json or bs58 encoded) (default: "wallet.json", env: WC_PRIVATE_KEY)
+  -w, --unwrap-wsol                    Unwrap wrapped SOL (env: WC_WSOL)
   -s --simulate-only                   Don't actually send transactions, just simulate them (default: false, env: WC_SIMULATE)
   -p --parallel-transactions <number>  Number of parallel transactions to send when batching instructions (default: 5, env: WC_PARALLEL_TX)
   -h, --help                           display help for command

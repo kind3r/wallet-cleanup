@@ -8,6 +8,7 @@ import { bytes } from "@coral-xyz/anchor/dist/cjs/utils";
 type Options = {
   rpc: string;
   keypair?: Keypair;
+  unwrapSol: boolean;
   simulateOnly: boolean;
   parallelTransactions: number;
 }
@@ -17,6 +18,7 @@ program.name("wallet-cleanup")
   .version(pkg.version)
   .addOption(new Option("-r, --rpc <string>", "RPC to use").default("https://api.mainnet-beta.solana.com").env("WC_RPC"))
   .addOption(new Option("-k, --private-key <string>", "Wallet private key (file or json or bs58 encoded)").default("wallet.json").env("WC_PRIVATE_KEY").makeOptionMandatory(true))
+  .addOption(new Option("-w, --unwrap-wsol", "Unwrap wrapped SOL").env("WC_WSOL"))
   .addOption(new Option("-s --simulate-only", "Don't actually send transactions, just simulate them").default(false).env("WC_SIMULATE"))
   .addOption(new Option("-p --parallel-transactions <number>", "Number of parallel transactions to send when batching instructions").default(5).argParser(parseInt).env("WC_PARALLEL_TX"))
 
@@ -68,6 +70,12 @@ export async function loadCliOptions() {
         }
       }
     }
+  }
+
+  if (args.unwrapWsol === true) {
+    cliOptions.unwrapSol = true;
+  } else {
+    cliOptions.unwrapSol = false;
   }
 
   if (args.simulateOnly === true) {

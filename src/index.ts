@@ -27,7 +27,7 @@ async function init() {
     process.exit(ERROR_RPC);
   }
   
-  await closeEmptyTokenAccounts(connection, options.keypair, logger, options.parallelTransactions, options.simulateOnly);
+  await closeEmptyTokenAccounts(connection, options.keypair, logger, options.parallelTransactions, options.unwrapSol, options.simulateOnly);
 
   process.exit(0);
 }

@@ -1,7 +1,7 @@
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { LoggerInterface } from "../types/logger";
 import { TransactionBatch, TransactionBatchBuilder } from "../solana/batchInstructions";
-import { TOKEN_PROGRAM_ID, createCloseAccountInstruction } from "@solana/spl-token";
+import { NATIVE_MINT, TOKEN_PROGRAM_ID, createCloseAccountInstruction } from "@solana/spl-token";
 import { Wallet } from "@coral-xyz/anchor";
 
 export async function closeEmptyTokenAccounts(
@@ -9,17 +9,19 @@ export async function closeEmptyTokenAccounts(
   keypair: Keypair,
   logger: LoggerInterface,
   parallelTransactions: number,
+  unwrapSol: boolean,
   simulateOnly: boolean = true,
 ): Promise<boolean> {
   const emptyAccounts: string[] = [];
   let emptyRent: number = 0;
+  const WSOL = NATIVE_MINT.toBase58();
 
   try {
     const accounts = await connection.getParsedTokenAccountsByOwner(keypair.publicKey, { programId: TOKEN_PROGRAM_ID });
     for (const account of accounts.value) {
       if (account.account.data && "parsed" in account.account.data && "info" in account.account.data.parsed && account.account.data.parsed.type === "account") {
         const info = account.account.data.parsed.info;
-        if (info.tokenAmount.uiAmount === 0) {
+        if (info.tokenAmount.uiAmount === 0 || (unwrapSol === true && info.mint === WSOL)) {
           emptyAccounts.push(account.pubkey.toBase58());
           emptyRent += account.account.lamports;
         }
@@ -31,7 +33,7 @@ export async function closeEmptyTokenAccounts(
     return false;
   }
 
-  logger.info(`Found ${emptyAccounts.length} empty accounts, total rent to recover ${Math.round((emptyRent / LAMPORTS_PER_SOL * 1000 ) / 1000)} SOL`);
+  logger.info(`Found ${emptyAccounts.length} empty accounts, total rent${unwrapSol === true ? " + wSOL" : ""} to recover ${Math.round(emptyRent / LAMPORTS_PER_SOL * 1000 ) / 1000} SOL`);
 
   if (emptyAccounts.length > 0) {
     try {
